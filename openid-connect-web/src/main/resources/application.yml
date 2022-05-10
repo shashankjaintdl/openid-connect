@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    username: sa
+    password:
+    url:  jdbc:h2:mem:test
+    driver-class-name: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    defer-datasource-initialization: true
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+  h2:
+    console:
+      enabled: true
+      settings:
+        trace: true
+        web-allow-others: false

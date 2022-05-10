@@ -1,0 +1,24 @@
+plugins{
+    id 'org.springframework.boot' version '2.6.6'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+}
+
+
+repositories {
+    flatDir {
+        dirs "$rootProject.projectDir/libs"
+    }
+}
+dependencies {
+
+//    implementation file("D:\\Projects\\ICS\\Auth-Server\\openid-connect\\openid-connect-server\\build\\libs\\openid-connect-server-1.0-SNAPSHOT.jar")
+//    implementation project(:openid-connect-common")
+    implementation project(":openid-connect-server")
+
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    runtimeOnly 'com.h2database:h2'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}

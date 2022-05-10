@@ -1,0 +1,61 @@
+plugins {
+
+	id 'idea'
+	id 'java'
+
+}
+
+
+
+subprojects {
+	apply plugin: 'java'
+}
+
+
+allprojects{
+
+	group 'com.ics'
+
+	version '1.0-SNAPSHOT'
+
+	// Declaring the Java Source Compatibility Version
+	java.sourceCompatibility(JavaVersion.VERSION_11)
+
+	apply from: "$rootProject.projectDir/dependencies.gradle"
+
+	repositories {
+		mavenCentral()
+		mavenLocal()
+	}
+
+	dependencies {
+		implementation libsRoot.googleGuava
+		implementation libsRoot.googleGson
+		implementation libsRoot.nimbusJWT
+		implementation libsRoot.springOAuth2
+		implementation libsRoot.springDataJPA
+		implementation libsRoot.springWeb
+		implementation libsRoot.servletApi
+		implementation libsRoot.springSecurityWeb
+
+		testImplementation 'org.mockito:mockito-junit-jupiter:4.3.1'
+		testImplementation 'org.mockito:mockito-core:4.3.1'
+
+		testImplementation libsRoot.mockito
+		testImplementation 'junit:junit:4.13.1'
+
+		testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+		testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+
+	}
+
+
+
+	test {
+		useJUnitPlatform()
+	}
+
+	tasks.withType(JavaCompile){
+		options.encoding = 'UTF-8'
+	}
+}
