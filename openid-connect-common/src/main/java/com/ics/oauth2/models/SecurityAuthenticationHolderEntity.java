@@ -1,5 +1,6 @@
 package com.ics.oauth2.models;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.io.Serializable;
@@ -28,8 +29,6 @@ public class SecurityAuthenticationHolderEntity {
     private Map<String, String> requestParameter;
 
     private Map<String, Serializable> extension;
-
-
 
 
 }

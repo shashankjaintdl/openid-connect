@@ -1,6 +1,5 @@
-package com.ics.oauth2;
+package com.ics.oauth2.models;
 
-import com.ics.oauth2.models.ClientDetailsEntity;
 import com.nimbusds.jwt.JWT;
 import org.springframework.security.oauth2.common.OAuth2RefreshToken;
 

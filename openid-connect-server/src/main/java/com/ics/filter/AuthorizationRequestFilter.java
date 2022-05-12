@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,13 +31,15 @@ import java.util.Map;
 @SuppressWarnings("deprecation")
 public class AuthorizationRequestFilter extends GenericFilterBean {
 
+    private static final String AUTHORIZATION_ENDPOINT = "/oauth2/authorize";
+
     private final OAuth2RequestFactory requestFactory;
 
     private final ClientDetailEntityService clientDetailEntityService;
 
     private final RedirectResolver redirectResolver;
 
-    private RequestMatcher requestMatcher = new AntPathRequestMatcher("/authorize");
+    private RequestMatcher requestMatcher = new AntPathRequestMatcher(AUTHORIZATION_ENDPOINT);
 
     @Autowired
     public AuthorizationRequestFilter(OAuth2RequestFactory requestFactory,
@@ -59,6 +62,7 @@ public class AuthorizationRequestFilter extends GenericFilterBean {
             chain.doFilter(req,res);
             return;
         }
+
         try {
 
             ClientDetailsEntity clientDetails = new ClientDetailsEntity();
@@ -69,9 +73,12 @@ public class AuthorizationRequestFilter extends GenericFilterBean {
                 clientDetails = clientDetailEntityService.loadClientByClientId(authRequest.getClientId());
             }
 
-
             String uri = redirectResolver.resolveRedirect(authRequest.getRedirectUri(),clientDetails);
             UriBuilder uriBuilder = UriComponentsBuilder.fromUriString(uri);
+
+
+
+            // TODO: Update it later to redirect
             res.sendRedirect(((UriComponentsBuilder) uriBuilder).toUriString());
 
 
