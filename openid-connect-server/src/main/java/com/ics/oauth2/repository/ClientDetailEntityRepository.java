@@ -11,4 +11,5 @@ public interface ClientDetailEntityRepository extends JpaRepository<ClientDetail
 
     Optional<ClientDetailsEntity> findByClientId(String clientId);
 
+
 }

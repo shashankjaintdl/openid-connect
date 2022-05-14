@@ -2,15 +2,20 @@ package com.ics.oauth2.service.impl;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import com.ics.oauth2.AppType;
 import com.ics.oauth2.GrantType;
 import com.ics.oauth2.TokenEndPointAuthMethod;
+import com.ics.oauth2.ValidationException;
 import com.ics.oauth2.repository.ClientDetailEntityRepository;
 import com.ics.oauth2.service.ClientDetailEntityService;
 import com.ics.oauth2.models.ClientDetailsEntity;
+import com.ics.oauth2.service.ReservedScopeService;
+import com.ics.openid.connect.service.ApprovedSiteService;
 import com.ics.openid.connect.service.BlacklistedSiteService;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.common.exceptions.InvalidClientException;
 import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
 import org.springframework.stereotype.Service;
@@ -25,14 +30,26 @@ import java.util.*;
 @SuppressWarnings("deprecation")
 public class ClientDetailEntityServiceImpl implements ClientDetailEntityService {
 
+    public static final String INVALID_CLIENT_METADATA = "invalid_client_metadata";
+
     private final ClientDetailEntityRepository clientDetailEntityRepository;
 
     private final BlacklistedSiteService blacklistedSiteService;
 
+    private final ApprovedSiteService approvedSiteService;
+
+    private final ReservedScopeService reservedScopeService;
+
     @Autowired
-    public ClientDetailEntityServiceImpl(ClientDetailEntityRepository clientDetailEntityRepository, BlacklistedSiteService blacklistedSiteService) {
+    public ClientDetailEntityServiceImpl(ClientDetailEntityRepository clientDetailEntityRepository,
+                                         BlacklistedSiteService blacklistedSiteService,
+                                         ApprovedSiteService approvedSiteService,
+                                         ReservedScopeService reservedScopeService) {
+
         this.clientDetailEntityRepository = clientDetailEntityRepository;
         this.blacklistedSiteService = blacklistedSiteService;
+        this.approvedSiteService = approvedSiteService;
+        this.reservedScopeService = reservedScopeService;
     }
 
     @PostConstruct
@@ -54,25 +71,22 @@ public class ClientDetailEntityServiceImpl implements ClientDetailEntityService 
             throw new IllegalArgumentException(" Can't save new client with existing ID "+ clientDetails.getId());
         }
 
-//        if(!clientDetails.getRegisteredRedirectUri().isEmpty()){
-//            for(String uri:clientDetails.getRegisteredRedirectUri()){
-//               if(Boolean.TRUE.equals(blacklistedSiteService.isBlacklisted(uri))){
-//                   throw new IllegalArgumentException("Can't registered Blacklisted site :"+uri);
-//               }
-//            }
-//        }
-
-        validateRedirectUri(clientDetails);
-        clientDetails = validateClientAuth(clientDetails);
-
 
         if(Strings.isNullOrEmpty(clientDetails.getClientId())){
            clientDetails = generateClientId(clientDetails);
         }
 
+        if(clientDetails.getResponseTypes() == null || clientDetails.getResponseTypes().isEmpty()){
+            clientDetails.setResponseTypes(Sets.newHashSet());
+        }
 
-        if(Strings.isNullOrEmpty(clientDetails.getClientSecret())){
-            clientDetails = generateClientSecret(clientDetails);
+
+        try{
+            validateRedirectUri(clientDetails);
+            clientDetails = validateClientAuth(clientDetails);
+        }
+        catch (ValidationException e){
+            e.printStackTrace();
         }
 
 
@@ -130,19 +144,20 @@ public class ClientDetailEntityServiceImpl implements ClientDetailEntityService 
      * check for request uri is blacklisted or URI is valid.
      * @return clientDetails
      */
-    private void validateRedirectUri(ClientDetailsEntity clientDetails){
+    private void validateRedirectUri(ClientDetailsEntity clientDetails) throws ValidationException{
         if(clientDetails.getGrantTypes().contains(GrantType.AUTHORIZATION_CODE.getValue())){
 
-            if (clientDetails.getRegisteredRedirectUri() == null  || clientDetails.getRegisteredRedirectUri().isEmpty()){
-                throw new IllegalArgumentException("");
+            if (clientDetails.getRegisteredRedirectUri() == null  ||
+                    clientDetails.getRegisteredRedirectUri().isEmpty()){
+                throw new ValidationException(INVALID_CLIENT_METADATA,"Clients using a redirect-based grant type must register at least one redirect URI.",HttpStatus.BAD_REQUEST);
             }
 
             for (String uri:clientDetails.getRegisteredRedirectUri()){
                 if(blacklistedSiteService.isBlacklisted(uri)){
-                    throw new IllegalArgumentException();
+                    throw new ValidationException(INVALID_CLIENT_METADATA,"Redirect URI is not allowed "+uri,HttpStatus.BAD_REQUEST);
                 }
                 if(uri.contains("#")){
-                    throw new IllegalArgumentException();
+                    throw new ValidationException(INVALID_CLIENT_METADATA,"Redirect URI can not have fragment "+uri,HttpStatus.BAD_REQUEST);
                 }
             }
 
@@ -155,7 +170,7 @@ public class ClientDetailEntityServiceImpl implements ClientDetailEntityService 
      * @param clientDetails
      * @return
      */
-    private ClientDetailsEntity validateClientAuth(ClientDetailsEntity clientDetails){
+    private ClientDetailsEntity validateClientAuth(ClientDetailsEntity clientDetails) throws ValidationException {
 
         if(clientDetails.getTokenEndPointAuthMethod()==null){
             clientDetails.setTokenEndPointAuthMethod(TokenEndPointAuthMethod.CLIENT_SECRET_BASIC);
@@ -183,10 +198,31 @@ public class ClientDetailEntityServiceImpl implements ClientDetailEntityService 
         }
 
         else{
-            throw new IllegalArgumentException("invalid_client_metadata, Unknown authentication method");
+            throw new ValidationException(INVALID_CLIENT_METADATA, "Unknown authentication method", HttpStatus.BAD_REQUEST);
         }
 
         return clientDetails;
     }
+
+    private ClientDetailsEntity validateGrantType(ClientDetailsEntity clientDetails) throws ValidationException{
+        if (clientDetails.getGrantTypes() == null || clientDetails.getGrantTypes().isEmpty()){
+            if(clientDetails.getScope().contains("offline_access")){
+                clientDetails.setGrantTypes(Sets.newHashSet(GrantType.AUTHORIZATION_CODE.getValue(),GrantType.REFRESH_TOKEN.getValue()));
+            }
+            else{
+                clientDetails.setGrantTypes(Sets.newHashSet(GrantType.AUTHORIZATION_CODE.getValue()));
+            }
+        }
+
+        return clientDetails;
+    }
+
+
+
+    private ClientDetailsEntity validateScope(ClientDetailsEntity clientDetails){
+
+        return null;
+    }
+
 
 }
