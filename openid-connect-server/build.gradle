@@ -2,4 +2,6 @@
 dependencies {
 
      implementation project(":openid-connect-common")
+     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf:2.6.7'
+
 }

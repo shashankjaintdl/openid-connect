@@ -1,9 +1,11 @@
-package com.ics.common;
+package com.ics.common.specs.openid;
+
+import com.ics.common.FieldContainer;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public enum Scope implements FieldContainer{
+public enum Scope implements FieldContainer {
 
     OPENID("openid"),
     PROFILE("profile"),

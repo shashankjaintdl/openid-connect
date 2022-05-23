@@ -1,9 +1,9 @@
 package com.ics.oauth2.models;
 
 import com.google.common.collect.ImmutableSet;
-import com.ics.oauth2.AppType;
-import com.ics.oauth2.SubjectType;
-import com.ics.oauth2.TokenEndPointAuthMethod;
+import com.ics.common.specs.oauth2.AppType;
+import com.ics.common.specs.oauth2.SubjectType;
+import com.ics.common.specs.oauth2.TokenEndPointAuthMethod;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

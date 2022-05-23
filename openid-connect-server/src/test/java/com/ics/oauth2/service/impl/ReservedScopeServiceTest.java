@@ -1,13 +1,10 @@
 package com.ics.oauth2.service.impl;
 
-import com.ics.oauth2.models.ReservedScope;
 import com.ics.oauth2.repository.ReservedScopeRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -22,9 +19,8 @@ class ReservedScopeServiceTest {
 
     @Test
     void testSaveReservedScope() throws Exception{
-        ReservedScope reservedScope = Mockito.mock(ReservedScope.class);
-        Mockito.when(reservedScope.getId()).thenReturn(1L);
-        Assertions.assertThrows(IllegalStateException.class,()->reservedScopeService.saveNew(reservedScope));
+
+
     }
 
 }

@@ -12,23 +12,18 @@ import java.util.Map;
 import java.util.Set;
 
 @Entity
+@Table(name = "oauth2_access_token")
 @SuppressWarnings("deprecation")
 public class OAuth2AccessTokenEntity implements OAuth2AccessToken {
 
     private Long id;
 
-    private ClientDetailsEntity clientDetailsEntity;
-
-    private String tokenType = OAuth2AccessToken.BEARER_TYPE;
-
     private JWT jwt;
-
-    private OAuth2RefreshTokenEntity refreshToken;
-
-    private Set<String> scope;
-
     private Date expiration;
-
+    private Set<String> scope;
+    private OAuth2RefreshTokenEntity refreshToken;
+    private ClientDetailsEntity clientDetailsEntity;
+    private String tokenType = OAuth2AccessToken.BEARER_TYPE;
     private Map<String, Object> additionalInformation = new HashMap<>();
 
 

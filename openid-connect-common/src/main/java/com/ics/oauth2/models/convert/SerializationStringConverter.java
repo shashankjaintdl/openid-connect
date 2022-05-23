@@ -35,6 +35,10 @@ public class SerializationStringConverter implements AttributeConverter<Serializ
 
     @Override
     public Serializable convertToEntityAttribute(String dbData) {
+        if(dbData==null){
+            return null;
+        }
         return dbData;
     }
+
 }

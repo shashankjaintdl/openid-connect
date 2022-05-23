@@ -1,7 +1,5 @@
-package com.ics.oauth2.utils;
+package com.ics.utils;
 
 public class ClientDetailEntityValidator {
-
-
 
 }

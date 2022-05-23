@@ -50,6 +50,11 @@ public class ClientRegistrationEndpoint {
     }
 
 
+    @GetMapping
+    public String index(){
+
+        return "index.html";
+    }
 
 
     @PreAuthorize("hasRole('ROLE_CLIENT')")

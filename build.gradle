@@ -26,6 +26,8 @@ allprojects{
 	repositories {
 		mavenCentral()
 		mavenLocal()
+
+
 	}
 
 	dependencies {
@@ -59,3 +61,6 @@ allprojects{
 		options.encoding = 'UTF-8'
 	}
 }
+
+
+

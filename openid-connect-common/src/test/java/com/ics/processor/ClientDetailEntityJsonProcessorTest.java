@@ -1,7 +1,7 @@
 package com.ics.processor;
 
 import com.google.common.collect.ImmutableSet;
-import com.ics.oauth2.*;
+import com.ics.common.specs.oauth2.*;
 import com.ics.oauth2.models.ClientDetailsEntity;
 import com.nimbusds.jose.EncryptionMethod;
 import com.nimbusds.jose.JWEAlgorithm;

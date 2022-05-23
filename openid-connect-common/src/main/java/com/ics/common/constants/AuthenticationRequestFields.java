@@ -1,4 +1,6 @@
-package com.ics.common;
+package com.ics.common.constants;
+
+import com.ics.common.FieldContainer;
 
 public final class AuthenticationRequestFields {
 
@@ -22,7 +24,7 @@ public final class AuthenticationRequestFields {
     public static final String LOGIN_HINT = "login_hint";
     public static final String ACR_VALUES = "acr_values";
 
-    public enum Display implements FieldContainer{
+    public enum Display implements FieldContainer {
 
         PAGE("page"),
         POPUP("popup"),

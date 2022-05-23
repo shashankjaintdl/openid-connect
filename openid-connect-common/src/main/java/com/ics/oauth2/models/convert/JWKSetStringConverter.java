@@ -25,8 +25,7 @@ public class JWKSetStringConverter implements AttributeConverter<JWKSet, String>
     public JWKSet convertToEntityAttribute(String dbData) {
         if(dbData!=null){
             try {
-                JWKSet jwkSet = JWKSet.parse(dbData);
-                return jwkSet;
+                return JWKSet.parse(dbData);
             } catch (ParseException e) {
                 LOGGER.error("Unable to parse JWKSet ",e);
                 return null;

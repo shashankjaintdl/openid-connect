@@ -5,15 +5,15 @@ import com.google.common.collect.Sets;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.ics.oauth2.AppType;
-import com.ics.oauth2.SubjectType;
-import com.ics.oauth2.TokenEndPointAuthMethod;
+import com.ics.common.specs.oauth2.AppType;
+import com.ics.common.specs.oauth2.SubjectType;
+import com.ics.common.specs.oauth2.TokenEndPointAuthMethod;
 import com.ics.oauth2.models.ClientDetailsEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.ics.oauth2.utils.JsonUtils.*;
-import static com.ics.oauth2.models.RegisteredClientDetailFields.*;
+import static com.ics.common.constants.RegisteredClientDetailFields.*;
 
 @SuppressWarnings("deprecation")
 public class ClientDetailEntityJsonProcessor {

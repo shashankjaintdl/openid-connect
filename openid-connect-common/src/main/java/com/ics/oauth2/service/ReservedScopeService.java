@@ -6,6 +6,7 @@ import java.util.Collection;
 
 public interface ReservedScopeService {
 
+
     ReservedScope saveNew(ReservedScope reservedScope);
 
     void remove(ReservedScope reservedScope);

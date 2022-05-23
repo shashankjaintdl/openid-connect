@@ -1,12 +1,13 @@
 package com.ics.oauth2.service.impl;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
-import com.ics.oauth2.AppType;
-import com.ics.oauth2.GrantType;
-import com.ics.oauth2.TokenEndPointAuthMethod;
-import com.ics.oauth2.ValidationException;
+import com.ics.common.specs.openid.Scope;
+import com.ics.common.specs.oauth2.AppType;
+import com.ics.common.specs.oauth2.GrantType;
+import com.ics.common.specs.oauth2.ResponseType;
+import com.ics.common.specs.oauth2.TokenEndPointAuthMethod;
+import com.ics.exception.ValidationException;
 import com.ics.oauth2.repository.ClientDetailEntityRepository;
 import com.ics.oauth2.service.ClientDetailEntityService;
 import com.ics.oauth2.models.ClientDetailsEntity;
@@ -16,6 +17,8 @@ import com.ics.openid.connect.service.BlacklistedSiteService;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.common.exceptions.InvalidClientException;
 import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
 import org.springframework.stereotype.Service;
@@ -46,22 +49,26 @@ public class ClientDetailEntityServiceImpl implements ClientDetailEntityService 
                                          ApprovedSiteService approvedSiteService,
                                          ReservedScopeService reservedScopeService) {
 
-        this.clientDetailEntityRepository = clientDetailEntityRepository;
-        this.blacklistedSiteService = blacklistedSiteService;
         this.approvedSiteService = approvedSiteService;
         this.reservedScopeService = reservedScopeService;
+        this.blacklistedSiteService = blacklistedSiteService;
+        this.clientDetailEntityRepository = clientDetailEntityRepository;
+
     }
 
     @PostConstruct
     public void postConstruct(){
         ClientDetailsEntity clientDetails = new ClientDetailsEntity();
         clientDetails.setClientId("client");
-        generateClientSecret(clientDetails);
         clientDetails.setApplicationType(AppType.WEB);
-        clientDetails.setScope(ImmutableSet.of("READ","WRITE"));
-        clientDetails.setGrantTypes(ImmutableSet.of("authorization_code"));
-        clientDetails.setRegisteredRedirectUri(ImmutableSet.of("www.google.com"));
-        clientDetailEntityRepository.save(clientDetails);
+        clientDetails.setResponseTypes(new HashSet<>(List.of("id_token")));
+        clientDetails.setScope(Set.of(Scope.OPENID.getValue(),Scope.PROFILE.getValue()));
+        Collection<GrantedAuthority> grantedAuthorities = new HashSet<>();
+        grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_CLIENT"));
+        clientDetails.setAuthorities(grantedAuthorities);
+        clientDetails.setGrantTypes(Set.of(GrantType.AUTHORIZATION_CODE.getValue()));
+        clientDetails.setRegisteredRedirectUri(Set.of("www.google.com"));
+        saveNewClient(clientDetails);
     }
 
     @Override
@@ -71,7 +78,6 @@ public class ClientDetailEntityServiceImpl implements ClientDetailEntityService 
             throw new IllegalArgumentException(" Can't save new client with existing ID "+ clientDetails.getId());
         }
 
-
         if(Strings.isNullOrEmpty(clientDetails.getClientId())){
            clientDetails = generateClientId(clientDetails);
         }
@@ -80,16 +86,18 @@ public class ClientDetailEntityServiceImpl implements ClientDetailEntityService 
             clientDetails.setResponseTypes(Sets.newHashSet());
         }
 
+        
+//
+//        try{
+//            clientDetails = validateGrantType(clientDetails);
+//            validateRedirectUri(clientDetails);
+////            clientDetails = validateClientAuth(clientDetails);
+//        }
+//        catch (ValidationException e){
+//            e.printStackTrace();
+//        }
 
-        try{
-            validateRedirectUri(clientDetails);
-            clientDetails = validateClientAuth(clientDetails);
-        }
-        catch (ValidationException e){
-            e.printStackTrace();
-        }
-
-
+        clientDetails.setCreatedAt(new Date());
         clientDetails.setDynamicallyRegistered(true);
 
         clientDetailEntityRepository.save(clientDetails);
@@ -214,10 +222,76 @@ public class ClientDetailEntityServiceImpl implements ClientDetailEntityService 
             }
         }
 
+        /** PASSWORD flow does not support **/
+        if(clientDetails.getGrantTypes().contains(GrantType.PASSWORD.getValue())){
+
+            throw new ValidationException(INVALID_CLIENT_METADATA,"The password grant type does not allowed to dynamically client registration",HttpStatus.BAD_REQUEST);
+        }
+
+        if(clientDetails.getGrantTypes().contains(GrantType.AUTHORIZATION_CODE.getValue())){
+
+            if(clientDetails.getGrantTypes().contains(GrantType.IMPLICIT.getValue())){
+
+                throw new ValidationException(INVALID_CLIENT_METADATA,"Incompatible requested grant type for authorization_code flow with :"+clientDetails.getGrantTypes(),HttpStatus.BAD_REQUEST);
+            }
+
+            if (clientDetails.getResponseTypes().contains(ResponseType.TOKEN.getValue())){
+
+                throw new ValidationException(INVALID_CLIENT_METADATA,"Incompatible requested response type for authorization_code flow with :"+clientDetails.getResponseTypes(),HttpStatus.BAD_REQUEST);
+            }
+
+            clientDetails.getResponseTypes().add(ResponseType.CODE.getValue());
+        }
+
+        if (clientDetails.getGrantTypes().contains(GrantType.IMPLICIT.getValue())){
+            if(clientDetails.getGrantTypes().contains(GrantType.AUTHORIZATION_CODE.getValue())){
+
+                throw new ValidationException(INVALID_CLIENT_METADATA,"Incompatible requested grant type for implicit flow with :"+clientDetails.getGrantTypes(),HttpStatus.BAD_REQUEST);
+            }
+
+            if(clientDetails.getResponseTypes().contains(ResponseType.CODE.getValue())){
+
+                throw new ValidationException(INVALID_CLIENT_METADATA,"Incompatible requested response type for implicit with :"+clientDetails.getResponseTypes(), HttpStatus.BAD_REQUEST);
+            }
+
+
+            clientDetails.getResponseTypes().add(ResponseType.TOKEN.getValue());
+
+            clientDetails.getGrantTypes().remove(GrantType.REFRESH_TOKEN.getValue());
+            clientDetails.getScope().remove("offline_access");
+        }
+
+        if(clientDetails.getScope().contains(GrantType.CLIENT_CREDENTIAL.getValue())){
+
+            if((clientDetails.getGrantTypes().contains(GrantType.AUTHORIZATION_CODE.getValue()) || clientDetails.getGrantTypes().contains(GrantType.IMPLICIT.getValue()))){
+
+                throw new ValidationException(INVALID_CLIENT_METADATA,"Incompatible requested grant type for client_credential flow with :"+clientDetails.getGrantTypes(),HttpStatus.BAD_REQUEST);
+            }
+
+            if(!clientDetails.getResponseTypes().isEmpty()){
+
+                throw new ValidationException(INVALID_CLIENT_METADATA,"Incompatible requested response type for client_credential flow with :"+clientDetails.getResponseTypes(),HttpStatus.BAD_REQUEST);
+            }
+
+            clientDetails.getGrantTypes().remove(GrantType.REFRESH_TOKEN.getValue());
+            clientDetails.getScope().remove("offline_access");
+            clientDetails.getScope().remove("openid");
+
+        }
+
         return clientDetails;
     }
 
 
+    private Set<String> assignResponseType(ClientDetailsEntity clientDetails, Set<ResponseType> responseTypes){
+        Set<String> response = new HashSet<>(clientDetails.getResponseTypes());
+
+        responseTypes.forEach(x->
+            response.add(x.getValue())
+        );
+
+        return response;
+    }
 
     private ClientDetailsEntity validateScope(ClientDetailsEntity clientDetails){
 

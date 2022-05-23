@@ -7,16 +7,16 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
+@Table(name = "oauth2_refresh_token")
 @SuppressWarnings("deprecation")
 public class OAuth2RefreshTokenEntity implements OAuth2RefreshToken {
 
     private Long id;
 
+    private JWT jwt;
+    private Date expirationDate;
     private ClientDetailsEntity clientDetailsEntity;
 
-    private JWT jwt;
-
-    private Date expirationDate;
 
     @Id
     @Column(name = "id")

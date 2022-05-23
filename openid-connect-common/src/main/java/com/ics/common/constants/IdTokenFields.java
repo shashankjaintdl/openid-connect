@@ -1,4 +1,4 @@
-package com.ics.common;
+package com.ics.common.constants;
 
 
 public final class IdTokenFields {

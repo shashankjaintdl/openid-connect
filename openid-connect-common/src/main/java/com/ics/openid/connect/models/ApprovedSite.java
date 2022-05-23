@@ -3,7 +3,7 @@ package com.ics.openid.connect.models;
 import javax.persistence.*;
 
 @Entity
-@Table
+@Table(name = "approved_site")
 public class ApprovedSite {
 
     private Long id;

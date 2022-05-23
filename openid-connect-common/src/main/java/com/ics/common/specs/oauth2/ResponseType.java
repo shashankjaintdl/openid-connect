@@ -1,4 +1,4 @@
-package com.ics.oauth2;
+package com.ics.common.specs.oauth2;
 
 import com.ics.common.FieldContainer;
 

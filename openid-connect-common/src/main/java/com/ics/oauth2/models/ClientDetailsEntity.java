@@ -1,14 +1,15 @@
 package com.ics.oauth2.models;
 
 
-import com.ics.oauth2.AppType;
-import com.ics.oauth2.SubjectType;
-import com.ics.oauth2.TokenEndPointAuthMethod;
+import com.ics.common.specs.oauth2.AppType;
+import com.ics.common.specs.oauth2.SubjectType;
+import com.ics.common.specs.oauth2.TokenEndPointAuthMethod;
 import com.ics.oauth2.models.convert.*;
 import com.nimbusds.jose.EncryptionMethod;
 import com.nimbusds.jose.JWEAlgorithm;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.JWKSet;
+import com.nimbusds.jwt.JWT;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.provider.ClientDetails;
 
@@ -99,6 +100,9 @@ public class ClientDetailsEntity implements Serializable, ClientDetails {
     private boolean reuseRefreshToken;
     private boolean dynamicallyRegistered;
     private Date createdAt;
+
+    /** Software statement **/
+    private JWT softwareStatement;
 
 
     @Id
@@ -365,7 +369,7 @@ public class ClientDetailsEntity implements Serializable, ClientDetails {
 
 
     @Override
-    @Transient
+    @Transient()
     public Map<String, Object> getAdditionalInformation() {
         return additionalInformation;
     }
@@ -640,4 +644,19 @@ public class ClientDetailsEntity implements Serializable, ClientDetails {
     public void setRequestObjectEncryptedResponseEnc(EncryptionMethod requestObjectEncryptedResponseEnc) {
         this.requestObjectEncryptedResponseEnc = requestObjectEncryptedResponseEnc;
     }
+
+    @Basic
+    @Column(name = "software_statement")
+    @Convert(converter = JwtStringConverter.class)
+    public JWT getSoftwareStatement() {
+        return softwareStatement;
+    }
+
+    public void setSoftwareStatement(JWT softwareStatement) {
+        this.softwareStatement = softwareStatement;
+    }
+
+
+
+
 }

@@ -11,10 +11,9 @@ repositories {
 }
 dependencies {
 
-//    implementation file("D:\\Projects\\ICS\\Auth-Server\\openid-connect\\openid-connect-server\\build\\libs\\openid-connect-server-1.0-SNAPSHOT.jar")
-//    implementation project(:openid-connect-common")
     implementation project(":openid-connect-server")
 
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf:2.6.7'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
@@ -22,3 +21,4 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
+
