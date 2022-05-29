@@ -5,29 +5,23 @@ ext.libsRoot = [
         'nimbusJWT': 'com.nimbusds:nimbus-jose-jwt:9.22',
         'springDataJPA': 'org.springframework.boot:spring-boot-starter-data-jpa:2.6.7',
         'springOAuth2': 'org.springframework.security.oauth:spring-security-oauth2:2.5.2.RELEASE',
+        'bouncycastle':'org.bouncycastle:bcprov-jdk15on:1.68',
+        'springValidation':'org.springframework.boot:spring-boot-starter-validation:2.7.0',
         'springSecurityWeb': 'org.springframework.security:spring-security-web:5.6.2',
         'springWeb':  'org.springframework:spring-web:5.3.18',
         'servletApi':'javax.servlet:javax.servlet-api:4.0.1',
-        'mockito':  'org.mockito:mockito-all:1.10.19'
 
-
-
-
+        //'springOAuth2': 'org.springframework.security:spring-security-oauth2-core:5.7.1',
 
 ]
-//
-//extlibs = [
-//5.6.2
-//
-//]
-//
-//implementation 'com.google.guava:guava:31.1-jre'
-//implementation 'com.google.code.gson:gson:2.9.0'
-//implementation 'com.nimbusds:nimbus-jose-jwt:9.22'
-//implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-////	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-//implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
-//implementation 'org.springframework.boot:spring-boot-starter-security'
-//implementation 'org.springframework.boot:spring-boot-starter-validation'
-//implementation 'org.springframework.boot:spring-boot-starter-web'
-//implementation 'org.springframework.security.oauth:spring-security-oauth2:2.5.2.RELEASE'
+
+ext.testlibs = [
+
+        'junit4': 'junit:junit:4.13.1',
+        'mockito':  'org.mockito:mockito-all:1.10.19',
+        'mockitoCore': 'org.mockito:mockito-core:4.3.1',
+        'mockitoJuipter': 'org.mockito:mockito-junit-jupiter:4.3.1',
+        'junitJuipterApi': 'org.junit.jupiter:junit-jupiter-api:5.8.2',
+        'juniJuipterEngine': 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+
+]

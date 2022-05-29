@@ -70,6 +70,15 @@ public final class RegisteredClientDetailFields {
       public static final String SOFTWARE_STATEMENT = "software_statement";
 
 
+      public static final String INITIAL_ACCESS_TOKEN = "initial_access_token";
+
+      public static final String REGISTRATION_ACCESS_TOKEN = "registration_access_token";
+      public static final String CLIENT_ID_ISSUED_AT = "client_id_issued_at";
+      public static final String CLIENT_SECRET_EXPIRES_AT = "client_secret_expire_at";
+      public static final String CLIENT_SECRET_ISSUED_AT = "client_secret_issue_at";
+      public static final String CLIENT_REGISTRATION_URI = "client_registration_uri";
+
+
       private RegisteredClientDetailFields(){}
 
 

@@ -1,5 +1,6 @@
 package com.ics.jwt.signer.service.impl;
 
+import com.google.common.base.Strings;
 import com.ics.jwt.signer.JwtSignService;
 import com.ics.jwt.signer.JwtValidationService;
 import com.nimbusds.jose.JOSEException;
@@ -12,22 +13,31 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class DefaultJwtSingerAndValidatorServiceImpl implements JwtSignService, JwtValidationService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultJwtSingerAndValidatorServiceImpl.class);
 
-    private Map<String, JWSSigner> signers = new HashMap<>();
+    private final Map<String, JWSSigner> signers = new HashMap<>();
 
-    private Map<String, JWSVerifier> verifiers = new HashMap<>();
+    private final Map<String, JWSVerifier> verifiers = new HashMap<>();
 
     private Map<String, JWK> jwks = new HashMap<>();
 
     private JWSAlgorithm defaultSigningAlg;
+
+    private String defaultSignerKeyId;
+
+    @Override
+    public String getDefaultSignerKeyId() {
+        return defaultSignerKeyId;
+    }
+
+    public void setDefaultSignerKeyId(String defaultSignerKeyId){
+        this.defaultSignerKeyId = defaultSignerKeyId;
+    }
 
     @Override
     public JWSAlgorithm getSigningAlgorithm() {
@@ -47,8 +57,14 @@ public class DefaultJwtSingerAndValidatorServiceImpl implements JwtSignService, 
 
     @Override
     public Collection<JWSAlgorithm> getAllSigningAlgorithm() {
-
-        return null;
+        Collection<JWSAlgorithm> alg = new HashSet<>();
+        for(JWSVerifier verifier:verifiers.values()){
+            alg.addAll(verifier.supportedJWSAlgorithms());
+        }
+        for(JWSSigner signer: signers.values()){
+            alg.addAll(signer.supportedJWSAlgorithms());
+        }
+        return alg;
     }
 
 
@@ -68,10 +84,41 @@ public class DefaultJwtSingerAndValidatorServiceImpl implements JwtSignService, 
     @Override
     public void signJwt(SignedJWT signedJWT) {
 
+        if (Strings.isNullOrEmpty(getDefaultSignerKeyId())){
+            throw new IllegalStateException("");
+        }
+
+        JWSSigner jwsSigner = signers.get(getDefaultSignerKeyId());
+
+        try {
+            signedJWT.sign(jwsSigner);
+        } catch (JOSEException e) {
+            LOGGER.error("");
+        }
+
     }
 
     @Override
     public void signJwt(SignedJWT signedJWT, JWSAlgorithm jwsAlgorithm) {
+        JWSSigner jwsSigner = null;
+
+        for (JWSSigner signer:signers.values()){
+            if (signer.supportedJWSAlgorithms().contains(jwsAlgorithm)){
+                jwsSigner = signer;
+                break;
+            }
+        }
+
+        if (jwsSigner==null){
+            throw new IllegalStateException("");
+        }
+
+        try {
+            signedJWT.sign(jwsSigner);
+        }
+        catch (JOSEException e) {
+            LOGGER.error("");
+        }
 
     }
 

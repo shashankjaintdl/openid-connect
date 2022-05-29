@@ -18,8 +18,6 @@ import static com.ics.common.constants.RegisteredClientDetailFields.*;
 @SuppressWarnings("deprecation")
 public class ClientDetailEntityJsonProcessor {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(ClientDetailEntityJsonProcessor.class);
-
     private static final JsonParser PARSER = new JsonParser();
 
     private ClientDetailEntityJsonProcessor(){
@@ -93,6 +91,10 @@ public class ClientDetailEntityJsonProcessor {
         c.setInitiateLoginUri(getAsString(o, INITIATE_LOGIN_URI));
         c.setRequestUris(getAsStringSet(o, REQUEST_URIS));
 
+        c.setAccessTokenValiditySeconds(getAsInteger(o, ACCESS_TOKEN_VALIDITY_SECONDS));
+        c.setRefreshTokenValiditySeconds(getAsInteger(o, REFRESH_TOKEN_VALIDITY_SECONDS));
+
+        c.setResourceIds(getAsStringSet(o,RESOURCE_IDS));
 
         String appType = getAsString(o, APPLICATION_TYPE);
         if (appType != null) {
@@ -102,9 +104,10 @@ public class ClientDetailEntityJsonProcessor {
         c.setSoftwareId(getAsString(o, SOFTWARE_ID));
         c.setSoftwareVersion(getAsString(o, SOFTWARE_VERSION));
 
-
         return c;
     }
+
+
 
 
 

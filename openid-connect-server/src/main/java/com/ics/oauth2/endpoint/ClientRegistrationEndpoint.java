@@ -1,6 +1,7 @@
 package com.ics.oauth2.endpoint;
 
 import com.google.gson.JsonSyntaxException;
+import com.ics.exception.ValidationException;
 import com.ics.oauth2.models.ClientDetailsEntity;
 import com.ics.oauth2.service.ClientDetailEntityService;
 import com.ics.processor.ClientDetailEntityJsonProcessor;
@@ -39,6 +40,7 @@ public class ClientRegistrationEndpoint {
         catch (JsonSyntaxException ex){
             ex.printStackTrace();
         }
+
         Objects.requireNonNull(client).setClientId(Strings.EMPTY);
         Objects.requireNonNull(client).setClientSecret(Strings.EMPTY);
 

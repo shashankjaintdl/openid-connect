@@ -8,13 +8,6 @@ import java.util.Collection;
 
 public interface JwtSignService {
 
-//JWEEncrypter;
-//JWEDecrypter;
-//JWEAlgorithm;
-//JWSAlgorithm;
-//JWSSigner;
-//JWSVerifier;
-
     JWSAlgorithm getSigningAlgorithm();
 
     Collection<JWSAlgorithm> getAllSigningAlgorithm();
@@ -22,5 +15,7 @@ public interface JwtSignService {
     void signJwt(SignedJWT signedJWT);
 
     void signJwt(SignedJWT signedJWT, JWSAlgorithm jwsAlgorithm);
+
+    String getDefaultSignerKeyId();
 
 }

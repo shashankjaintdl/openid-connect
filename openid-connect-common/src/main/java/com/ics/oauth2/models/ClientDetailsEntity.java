@@ -656,7 +656,4 @@ public class ClientDetailsEntity implements Serializable, ClientDetails {
         this.softwareStatement = softwareStatement;
     }
 
-
-
-
 }

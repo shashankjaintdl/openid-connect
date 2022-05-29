@@ -1,8 +1,8 @@
 package com.ics.oauth2.service;
 
 import com.ics.oauth2.models.ClientDetailsEntity;
-import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
+import org.springframework.security.oauth2.provider.ClientRegistrationException;
 
 import java.util.Collection;
 
@@ -13,10 +13,10 @@ public interface ClientDetailEntityService extends ClientDetailsService {
 
     ClientDetailsEntity getClientById(Long id);
 
-    ClientDetailsEntity updateClient(ClientDetailsEntity oldClient, ClientDetailsEntity newClient);
+    ClientDetailsEntity updateClient(ClientDetailsEntity clientDetails);
 
     @Override
-    ClientDetailsEntity loadClientByClientId(String clientId) throws OAuth2Exception;
+    ClientDetailsEntity loadClientByClientId(String clientId) throws ClientRegistrationException;
 
     ClientDetailsEntity generateClientId(ClientDetailsEntity clientDetails);
 
